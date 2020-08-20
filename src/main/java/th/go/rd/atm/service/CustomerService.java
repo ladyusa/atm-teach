@@ -2,19 +2,31 @@ package th.go.rd.atm.service;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import th.go.rd.atm.data.CustomerRepository;
 import th.go.rd.atm.model.Customer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class CustomerService {
-    private ArrayList<Customer> customers = new ArrayList<>();
+    private CustomerRepository repository;
+
+    public CustomerService(CustomerRepository repository) {
+        this.repository = repository;
+    }
 
     public void createCustomer(Customer customer) {
         String hashPin = hash(customer.getPin());
         customer.setPin(hashPin);
-        customers.add(customer);
+        repository.save(customer);
+    }
+
+    public Customer findCustomer(int id) {
+        return  repository.findById(id);
+    }
+
+    public List<Customer> getCustomers() {
+        return repository.findAll();
     }
 
     public Customer checkPin(Customer inputCustomer) {
@@ -27,18 +39,6 @@ public class CustomerService {
                 return storedCustomer;
         }
         return null;
-    }
-
-    public Customer findCustomer(int id) {
-        for (Customer customer : customers) {
-            if (customer.getId() == id)
-                return customer;
-        }
-        return null;
-    }
-
-    public List<Customer> getCustomers() {
-        return new ArrayList<>(customers);
     }
 
     private String hash(String pin) {
