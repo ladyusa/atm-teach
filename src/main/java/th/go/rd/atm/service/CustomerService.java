@@ -17,6 +17,26 @@ public class CustomerService {
         customers.add(customer);
     }
 
+    public Customer checkPin(Customer inputCustomer) {
+        Customer storedCustomer = findCustomer(inputCustomer.getId());
+
+        if (storedCustomer != null) {
+            String storedPin = storedCustomer.getPin();
+
+            if (BCrypt.checkpw(inputCustomer.getPin(), storedPin))
+                return storedCustomer;
+        }
+        return null;
+    }
+
+    public Customer findCustomer(int id) {
+        for (Customer customer : customers) {
+            if (customer.getId() == id)
+                return customer;
+        }
+        return null;
+    }
+
     public List<Customer> getCustomers() {
         return new ArrayList<>(customers);
     }
